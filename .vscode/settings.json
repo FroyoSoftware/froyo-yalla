@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^python3 - <<'PY'\nimport os\nfrom collections import Counter\nroot='\\.'\nexclude=\\{'node_modules','\\.git','\\.next'\\}\nc=Counter\\(\\)\nfor dp, dns, fns in os\\.walk\\(root\\):\n    dns\\[:\\] = \\[d for d in dns if d not in exclude\\]\n    for f in fns:\n        p=os\\.path\\.join\\(dp,f\\)\n        name=f\n        ext=os\\.path\\.splitext\\(name\\)\\[1\\]\\.lower\\(\\)\n        key=ext if ext else '\\[no_ext\\]'\n        c\\[key\\]\\+=1\nfor k,v in sorted\\(c\\.items\\(\\), key=lambda kv:\\(-kv\\[1\\], kv\\[0\\]\\)\\):\n    print\\(f\"\\{k\\}\\\\t\\{v\\}\"\\)\nPY$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}
