@@ -17,7 +17,7 @@
 - **Next.js 16.2.4** App Router + TypeScript（注意：版本较新，有 breaking changes，`cookies()` 是 async）
 - Supabase（Postgres + Google OAuth + Realtime）— project ID: `gzrphmankmaqlmqepgvk`
 - shadcn/ui（使用 `@base-ui/react`，**非** Radix）+ Tailwind CSS（移动端优先）
-- Vercel 部署（待完成）
+- Vercel 部署（已完成，生产域名 `yalla.froyo.me`）
 
 ## 关键约束（勿忘）
 
@@ -29,6 +29,8 @@
 - Admin 校验：server action 对比 `session.user.email === process.env.ADMIN_EMAIL`（env var 名 `ADMIN_EMAIL`，非 `NEXT_PUBLIC_`）
 - 表名 `participant_order`（`order` 是 SQL 保留字）
 - quantity >= 0，最小值 0，+/- 按钮 ≥ 44px 点击热区
+- 参与者特别备注上限 150 字（UI maxLength=150，DB constraint 300，以 UI 为准）
+- seed 按固定 `ACTIVITY_ID` upsert，不按标题匹配；regex 用 `[ \t]*` 而非 `\s*` 防跨行
 
 ## 文件结构（实际）
 
@@ -66,6 +68,8 @@ menu.md                           ← 菜单源文件
 - 旧活动 ID（无备注）：`571c5cce-8948-4068-85f1-0908e248e5fd`
 - ADMIN_EMAIL：`froyosoftware@gmail.com`
 - Google OAuth Client ID：`185404195869-pa85afrdntjcs63sbo42l7vcqt5pc7c2.apps.googleusercontent.com`
+- 生产域名：`https://yalla.froyo.me`
+- GitHub 仓库：`https://github.com/FroyoSoftware/froyo-yalla`
 
 ## 完成状态
 
@@ -88,13 +92,31 @@ menu.md                           ← 菜单源文件
 - [x] seed 改为 upsert（按标题匹配），ID 永久稳定
 - [x] parseDeadline 修复（支持 YYYY-M-D 格式，不再 hardcode）
 - [x] 页面展示发起人 + 截止日期（仅日期，无时间）
-- [ ] Vercel 部署
+- [x] Vercel 部署（froyo-yalla.vercel.app，env vars 已配置）
+- [x] 自定义域名接入（yalla.froyo.me + Cloudflare CNAME）
+- [x] GitHub 首次推送（origin/main）
+- [x] 线上 admin 统计异常修复（root cause: Invalid API key / service role key）
+- [x] 管理员邮箱比对容错（trim + dequote + lowercase）
+- [x] seed 改为按固定 ACTIVITY_ID upsert（标题改了也不新建，ID 永久稳定）
+- [x] seed regex 修复（`\s*` → `[ \t]*`，防止跨行误读 description）
+- [x] 登录后跳回原活动页（proxy returnTo → signInWithGoogle → callback）
+- [x] OAuth Redirect URLs 补齐 `?*` 通配符（localhost + 生产）
+- [x] 一键清空订单（删除 participant_order + participant_note）
+- [x] 删除确认改为页面内警告弹窗（非浏览器原生 confirm）；背景点击可关闭
+- [x] UI 优化：Host 标签、截止日期加年份、· 分隔符、description/badge spacing
+- [x] 备注字数上限统一为 150（UI maxLength + server action 校验 + DB constraint）
+- [x] normalizeEmail 提取到 lib/utils.ts，消除三处重复定义
+- [x] 删除未使用的 shadcn 组件（badge/button/card/separator/table）
 - [ ] Realtime 实时刷新（未来功能）
 - [ ] 短链接 slug（未来功能）
 
 ---
 
 ## 下一步（新 session 从这里开始）
+
+**当前状态：v1 已上线，核心链路稳定。下一步按需选做：**
+- Realtime 实时刷新（admin 页自动更新）
+- 短链接 slug（URL 不暴露 UUID）
 
 ### 第一步：迁移基线（已完成）
 
@@ -143,10 +165,11 @@ npm run dev
 - [ ] Google 登录 → 跳回活动页
 - [ ] 看到菜单 + 备注 badge
 - [ ] 提交点单 + 特别备注 → 成功 toast
+- [ ] 点击 Clear all → 弹出警告窗口；确认后数量与备注均清空
 - [ ] 用 `froyosoftware@gmail.com` 登录 → 看到 "Organizer" 链接
 - [ ] 组织者汇总页：总量 + 每人明细 + 特别备注
 
-### 第三步：Vercel 部署
+### 第三步：Vercel 运营要点（已上线后）
 
 ```bash
 npx vercel --prod
@@ -157,9 +180,21 @@ npx vercel --prod
 # ADMIN_EMAIL
 ```
 
-部署后还需在以下地方更新回调 URL：
-- Google Auth Platform → 授权重定向 URI 加 `https://<your-domain>/auth/callback`
-- Supabase Dashboard → Authentication → URL Configuration → Site URL + Redirect URLs
+已完成域名：`https://yalla.froyo.me`
+
+OAuth 配置要求（当前应保持如下）：
+- Google Auth Platform：保留 Supabase callback（`https://gzrphmankmaqlmqepgvk.supabase.co/auth/v1/callback`）
+- Supabase Dashboard：
+  - Site URL = `https://yalla.froyo.me`
+  - Redirect URLs 至少包含：
+    - `http://localhost:3000/auth/callback`
+    - `http://localhost:3000/auth/callback?*`
+    - `https://yalla.froyo.me/auth/callback`
+    - `https://yalla.froyo.me/auth/callback?*`
+
+当前发布状态：
+- v1 上线稳定，最新一次 commit 包含：clear all 弹窗、备注 150 字统一、normalizeEmail 提取、shadcn 死代码清理
+- 下次改动后记得 `npx vercel --prod` 同步到生产
 
 ### 第四步：推送 GitHub（防密钥泄露）
 

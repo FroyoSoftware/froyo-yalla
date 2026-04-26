@@ -1,12 +1,9 @@
 'use server'
 
 import { createClient, createAdminClient } from '@/lib/supabase'
+import { normalizeEmail } from '@/lib/utils'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-
-function normalizeEmail(value: string | null | undefined) {
-  return (value ?? '').trim().replace(/^['\"]|['\"]$/g, '').toLowerCase()
-}
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
 
@@ -138,6 +135,7 @@ export async function upsertOrder(
   }
 
   const cleanedNote = specialNote.trim()
+  if (cleanedNote.length > 150) throw new Error('Note must be 150 characters or fewer.')
   if (cleanedNote.length > 0) {
     const { error } = await supabase
       .from('participant_note')
@@ -162,6 +160,32 @@ export async function upsertOrder(
     if (error && !error.message.includes("Could not find the table 'public.participant_note'")) {
       throw new Error(error.message)
     }
+  }
+}
+
+export async function clearMyOrder(activityId: string) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not authenticated')
+
+  const { error: orderError } = await supabase
+    .from('participant_order')
+    .delete()
+    .eq('activity_id', activityId)
+    .eq('user_id', user.id)
+
+  if (orderError) throw new Error(orderError.message)
+
+  const { error: noteError } = await supabase
+    .from('participant_note')
+    .delete()
+    .eq('activity_id', activityId)
+    .eq('user_id', user.id)
+
+  if (noteError && !noteError.message.includes("Could not find the table 'public.participant_note'")) {
+    throw new Error(noteError.message)
   }
 }
 

@@ -1,11 +1,7 @@
 import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
-import { getActivityWithMenu, getAdminSummary } from '@/lib/actions'
-import { signOut } from '@/lib/actions'
-
-function normalizeEmail(value: string | null | undefined) {
-  return (value ?? '').trim().replace(/^['\"]|['\"]$/g, '').toLowerCase()
-}
+import { getActivityWithMenu, getAdminSummary, signOut } from '@/lib/actions'
+import { normalizeEmail } from '@/lib/utils'
 
 interface Props {
   params: Promise<{ id: string }>

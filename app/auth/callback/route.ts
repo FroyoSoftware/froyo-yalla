@@ -9,6 +9,7 @@ export async function GET(request: Request) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
+      // Supabase passes through extra queryParams in the callback URL
       const returnTo = searchParams.get('returnTo')
       const dest = returnTo && returnTo.startsWith('/') ? returnTo : '/'
       return NextResponse.redirect(new URL(dest, origin))

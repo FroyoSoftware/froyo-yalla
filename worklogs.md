@@ -131,3 +131,100 @@
 **Token 用量：** Input 0 · Output 0 · Cache read 0 · Cache creation 0
 
 工作内容：UI修复：重复日期bug(regex\s*跨行)、登录returnTo、Host标签、年份显示、seed固定ID；git init完成待push到GitHub
+
+---
+
+## 2026/04/25 Session 5（with Copilot）  合计 ~4h+
+
+| 时段 | 时间 (EDT) | 时长 | 订阅摊销 |
+|------|-----------|------|---------|
+| 晚间 | ~18:30 → ~22:40（估） | ~4h+ | 月费摊销 |
+
+工作内容：
+- ✅ 项目体检与上线评估：仓库规模统计、代码行数统计、路由/迁移数量核对，形成 MVP 可上线判断
+- ✅ 文档同步：新增 MVP 上线清单、重写 README 为项目化说明、补齐 CLAUDE 下一步与安全推送步骤
+- ✅ GitHub 上线：初始化与修正本地 Git 配置，首次提交并推送到 `FroyoSoftware/froyo-yalla`
+- ✅ 密钥安全加固：`.env.example` 模板落地、`.env.local` 持续忽略、脚本日志去除 key 片段输出
+- ✅ Vercel 首次上线：CLI 登录、项目创建、GitHub 关联、生产部署成功
+- ✅ 自定义域名上线：`yalla.froyo.me` 接入 Cloudflare + Vercel，`froyo-yalla.vercel.app` 重定向到新域名
+- ✅ 线上连通性验证：主页、登录页、活动页、回调页、域名跳转全部通过 HTTP 状态检查
+- ✅ 关键故障排查：线上 admin 页无统计信息问题定位为 `SUPABASE_SERVICE_ROLE_KEY` 无效（Invalid API key）
+- ✅ 线上修复发布：重置 Vercel 生产 key、重新部署、管理员统计恢复可见
+- ✅ 稳定性修复：管理员邮箱比对增加容错（去空格/去引号/小写）并发布线上
+
+结果：`https://yalla.froyo.me` 已可用，管理员汇总页恢复正常，当前可用于真实 MVP 使用。
+
+---
+
+## 2026/04/25 Session（with Claude · e5d2babf）  0m  $0.00
+
+| 时段 | 时间 (EDT) | 时长 | API 成本 |
+|------|-----------|------|---------|
+|  | 23:23 → 22:01 | 0m | $0.00 |
+
+**Token 用量：** Input 0 · Output 0 · Cache read 0 · Cache creation 0
+
+工作内容：Copilot完成：Vercel部署+自定义域名yalla.froyo.me、GitHub首推、admin统计bug修复(service key + normalizeEmail)
+
+---
+
+## 2026/04/25 Session（with Claude · e5d2babf）  0m  $0.00
+
+| 时段 | 时间 (EDT) | 时长 | API 成本 |
+|------|-----------|------|---------|
+|  | 02:01 → 22:05 | 0m | $0.00 |
+
+**Token 用量：** Input 0 · Output 0 · Cache read 0 · Cache creation 0
+
+工作内容：v1上线后维护：讨论登录后跳回活动页的bug修复方案
+
+---
+
+## 2026/04/25 Session（with Claude · e5d2babf）  0m  $0.00
+
+| 时段 | 时间 (EDT) | 时长 | API 成本 |
+|------|-----------|------|---------|
+|  | 02:01 → 23:46 | 0m | $0.00 |
+
+**Token 用量：** Input 0 · Output 0 · Cache read 0 · Cache creation 0
+
+工作内容：定位并修复登录后未跳回活动页的 bug：Supabase Redirect URLs 白名单未匹配带 query string 的 callback URL，需在 Dashboard 新增 https://yalla.froyo.me/auth/callback?* 通配符条目
+
+---
+
+## 2026/04/26 Session（with Claude · e5d2babf）  0m  $0.00
+
+| 时段 | 时间 (EDT) | 时长 | API 成本 |
+|------|-----------|------|---------|
+|  | 02:01 → 00:04 | 0m | $0.00 |
+
+**Token 用量：** Input 0 · Output 0 · Cache read 0 · Cache creation 0
+
+工作内容：新增一键清空订单功能（删除 participant_order + participant_note），并将删除确认改为页面内警告弹窗；确认 OAuth callback 规则已补充 ?*；当前改动尚未 commit/push/deploy
+
+---
+
+## 2026/04/26 Session 1（with Copilot）  合计 ~0.5h
+
+| 时段 | 时间 (CST) | 时长 | 订阅摊销 |
+|------|-----------|------|---------|
+| 夜间 | ~12:00 → ~12:30（估） | ~0.5h | 月费摊销 |
+
+工作内容：
+- ✅ 修复登录后回跳链路：确认 Supabase Redirect URLs 增加 `http://localhost:3000/auth/callback?*` 与 `https://yalla.froyo.me/auth/callback?*`
+- ✅ 新增“Clear all”能力：删除当前用户在当前 activity 下的 `participant_order` 与 `participant_note`
+- ✅ 删除交互升级为页面内警告弹窗（Cancel / Yes, clear），替代浏览器原生 confirm
+- ✅ 文档同步：CLAUDE.md 更新测试清单与 OAuth 配置要求
+- ⏸️ 发布状态：未 deploy，等待 Claude review 后再决定 commit/push/deploy
+
+---
+
+## 2026/04/26 Session（with Claude · 5d4a7a1b）  0m  $0.00
+
+| 时段 | 时间 (EDT) | 时长 | API 成本 |
+|------|-----------|------|---------|
+|  | 04:05 → 00:08 | 0m | $0.00 |
+
+**Token 用量：** Input 0 · Output 0 · Cache read 0 · Cache creation 0
+
+工作内容：实现 clear all 订单功能（页面内确认弹窗替代原生 confirm），UI 优化：Host 标签、截止日期年份、· 分隔符、badge spacing
