@@ -3,6 +3,10 @@ import { createClient } from '@/lib/supabase'
 import { getActivityWithMenu, getAdminSummary } from '@/lib/actions'
 import { signOut } from '@/lib/actions'
 
+function normalizeEmail(value: string | null | undefined) {
+  return (value ?? '').trim().replace(/^['\"]|['\"]$/g, '').toLowerCase()
+}
+
 interface Props {
   params: Promise<{ id: string }>
 }
@@ -16,7 +20,9 @@ export default async function AdminPage({ params }: Props) {
   } = await supabase.auth.getUser()
 
   if (!user) redirect('/login')
-  if (user.email !== process.env.ADMIN_EMAIL) {
+  const userEmail = normalizeEmail(user.email)
+  const adminEmail = normalizeEmail(process.env.ADMIN_EMAIL)
+  if (!userEmail || userEmail !== adminEmail) {
     redirect(`/activity/${id}`)
   }
 

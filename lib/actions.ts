@@ -4,6 +4,10 @@ import { createClient, createAdminClient } from '@/lib/supabase'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
+function normalizeEmail(value: string | null | undefined) {
+  return (value ?? '').trim().replace(/^['\"]|['\"]$/g, '').toLowerCase()
+}
+
 // ─── Auth ────────────────────────────────────────────────────────────────────
 
 export async function signInWithGoogle(returnTo: string = '/') {
@@ -167,7 +171,10 @@ export async function getAdminSummary(activityId: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user || user.email !== process.env.ADMIN_EMAIL) {
+  const userEmail = normalizeEmail(user?.email)
+  const adminEmail = normalizeEmail(process.env.ADMIN_EMAIL)
+
+  if (!user || !userEmail || userEmail !== adminEmail) {
     throw new Error('Forbidden')
   }
 

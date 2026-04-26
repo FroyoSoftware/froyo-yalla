@@ -5,6 +5,10 @@ import OrderForm from './OrderForm'
 import ShareButton from './ShareButton'
 import { signOut } from '@/lib/actions'
 
+function normalizeEmail(value: string | null | undefined) {
+  return (value ?? '').trim().replace(/^['\"]|['\"]$/g, '').toLowerCase()
+}
+
 interface Props {
   params: Promise<{ id: string }>
 }
@@ -32,7 +36,7 @@ export default async function ActivityPage({ params }: Props) {
   const userName =
     user.user_metadata?.full_name ?? user.email ?? 'Guest'
 
-  const isOrganizer = user.email === process.env.ADMIN_EMAIL
+  const isOrganizer = normalizeEmail(user.email) === normalizeEmail(process.env.ADMIN_EMAIL)
 
   return (
     <main className="min-h-screen bg-background">
