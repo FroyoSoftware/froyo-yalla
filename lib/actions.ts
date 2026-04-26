@@ -180,26 +180,32 @@ export async function getAdminSummary(activityId: string) {
 
   const admin = createAdminClient()
 
-  const { data: menuItems } = await admin
+  const { data: menuItems, error: menuErr } = await admin
     .from('menu_item')
     .select('id, name, unit, note, sort_order')
     .eq('activity_id', activityId)
     .order('sort_order')
+  if (menuErr) {
+    throw new Error(`menu_item query failed: ${menuErr.message}`)
+  }
 
-  const { data: orders } = await admin
+  const { data: orders, error: ordersErr } = await admin
     .from('participant_order')
     .select('user_id, menu_item_id, quantity')
     .eq('activity_id', activityId)
+  if (ordersErr) {
+    throw new Error(`participant_order query failed: ${ordersErr.message}`)
+  }
 
   const { data: notes, error: notesErr } = await admin
     .from('participant_note')
     .select('user_id, note')
     .eq('activity_id', activityId)
 
-  const notesData =
-    notesErr && notesErr.message.includes("Could not find the table 'public.participant_note'")
-      ? []
-      : (notes ?? [])
+  if (notesErr && !notesErr.message.includes("Could not find the table 'public.participant_note'")) {
+    throw new Error(`participant_note query failed: ${notesErr.message}`)
+  }
+  const notesData = notes ?? []
 
   // Fetch user emails from auth.users via admin API
   const userIds = [...new Set((orders ?? []).map((o) => o.user_id))]
