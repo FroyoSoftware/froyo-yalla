@@ -107,6 +107,9 @@ menu.md                           ← 菜单源文件
 - [x] 备注字数上限统一为 150（UI maxLength + server action 校验 + DB constraint）
 - [x] normalizeEmail 提取到 lib/utils.ts，消除三处重复定义
 - [x] 删除未使用的 shadcn 组件（badge/button/card/separator/table）
+- [x] UX：无 item 时 Submit 灰掉；note/item 变动时 error 动态消失；主动 amber 警告（有 note 无 item）
+- [x] Share 按钮改为 Copy 图标（lucide-react），复制后短暂显示 Check
+- [x] 登录跳转修复（root cause：callback 用自定义 NextResponse.redirect，session cookie 未写入；改为直接在 redirectResponse 上 setAll；returnTo 改用 cookie 传递，不再依赖 OAuth query param）
 - [ ] Realtime 实时刷新（未来功能）
 - [ ] 短链接 slug（未来功能）
 

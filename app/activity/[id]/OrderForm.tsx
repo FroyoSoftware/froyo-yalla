@@ -45,6 +45,7 @@ export default function OrderForm({
     }))
     setSaved(false)
     setCleared(false)
+    setError(null)
   }
 
   function handleSubmit() {
@@ -163,12 +164,37 @@ export default function OrderForm({
             setSpecialNote(e.target.value)
             setSaved(false)
             setCleared(false)
+            setError(null)
           }}
           placeholder="Anything else you want to eat?"
           className="w-full min-h-28 rounded-lg border border-border bg-background px-3 py-2.5 text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ring"
           maxLength={150}
         />
       </div>
+
+      {error && (
+        <p className="text-center text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-lg py-2 px-3">
+          {error}
+        </p>
+      )}
+
+      {!error && saved && (
+        <p className="text-center text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg py-2 px-3">
+          Your order has been saved. You can update it anytime.
+        </p>
+      )}
+
+      {!error && !saved && cleared && (
+        <p className="text-center text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg py-2 px-3">
+          Your order has been cleared.
+        </p>
+      )}
+
+      {!error && !saved && !cleared && total === 0 && specialNote.trim().length > 0 && (
+        <p className="text-center text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg py-2 px-3">
+          You have a note but no items selected. Please add at least one item.
+        </p>
+      )}
 
       <div className="flex items-center justify-between pt-2">
         <span className="text-sm text-muted-foreground">
@@ -187,31 +213,13 @@ export default function OrderForm({
           </button>
           <button
             onClick={handleSubmit}
-            disabled={isPending}
+            disabled={isPending || total === 0}
             className="px-6 py-2.5 rounded-lg bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {isPending && pendingAction === 'save' ? 'Saving...' : saved ? 'Saved' : hasOrdered ? 'Update' : 'Submit'}
           </button>
         </div>
       </div>
-
-      {saved && (
-        <p className="text-center text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg py-2 px-3">
-          Your order has been saved. You can update it anytime.
-        </p>
-      )}
-
-      {cleared && (
-        <p className="text-center text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg py-2 px-3">
-          Your order has been cleared.
-        </p>
-      )}
-
-      {error && (
-        <p className="text-center text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-lg py-2 px-3">
-          {error}
-        </p>
-      )}
 
       {showClearDialog && (
         <div

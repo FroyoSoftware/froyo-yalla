@@ -2,7 +2,7 @@
 
 import { createClient, createAdminClient } from '@/lib/supabase'
 import { normalizeEmail } from '@/lib/utils'
-import { headers } from 'next/headers'
+import { headers, cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
@@ -15,7 +15,18 @@ export async function signInWithGoogle(returnTo: string = '/') {
   const origin = `${protocol}://${host}`
 
   const safeReturnTo = returnTo.startsWith('/') ? returnTo : '/'
-  const callbackUrl = `${origin}/auth/callback?returnTo=${encodeURIComponent(safeReturnTo)}`
+
+  // Store returnTo in a cookie — query params can be dropped by Supabase OAuth
+  const cookieStore = await cookies()
+  cookieStore.set('auth_return_to', safeReturnTo, {
+    path: '/',
+    maxAge: 300,
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: !host.startsWith('localhost'),
+  })
+
+  const callbackUrl = `${origin}/auth/callback`
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
